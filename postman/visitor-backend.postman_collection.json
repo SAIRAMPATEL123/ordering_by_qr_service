@@ -1,0 +1,83 @@
+{
+  "info": {
+    "_postman_id": "7b4e52a9-6f68-4f01-9c67-visitor-backend",
+    "name": "Visitor Backend APIs",
+    "description": "Postman collection for the Spring Boot backend APIs built so far.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Create First Time User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Sai\",\n  \"lastName\": \"Kumar\",\n  \"email\": \"sai@example.com\",\n  \"phoneNumber\": \"9876543210\",\n  \"country\": \"India\",\n  \"state\": \"Telangana\",\n  \"city\": \"Hyderabad\",\n  \"postalCode\": \"500001\",\n  \"addressLine\": \"Madhapur\",\n  \"signupSource\": \"website\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/first-time",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "first-time"
+              ]
+            },
+            "description": "Creates a user on first visit. If email or phone number already exists, the API returns the existing user details."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": 1,\n  \"items\": [\n    {\n      \"productName\": \"iPhone 15\",\n      \"quantity\": 2,\n      \"priceFromUi\": 70000\n    },\n    {\n      \"productName\": \"AirPods Pro\",\n      \"quantity\": 1,\n      \"priceFromUi\": 22000\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders"
+              ]
+            },
+            "description": "Creates an order for an existing customer. The sample product names match the seeded product data."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ]
+}
