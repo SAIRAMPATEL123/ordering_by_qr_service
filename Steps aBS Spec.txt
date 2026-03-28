@@ -1,0 +1,112 @@
+## 🍽️ QR Ordering App Lifecycle (Food Ordering Use Case)
+
+Great news: you’re asking exactly the right question for user flow design. This lifecycle is clear, linear, and it maps to frontend + backend APIs cleanly.
+
+---
+
+### 1. QR code creation (restaurant side)
+- Restaurant generates QR code per table/zone.
+- QR payload example:
+  - `https://yourapp.com/order?tableId=12&restaurantId=5`
+- QR contains either direct URL or a short code (`TABLE-12-XYZ`).
+
+---
+
+### 2. Customer scans QR (mobile browser open)
+- Result => a web page route: `/order?tableId=12`.
+- UI resolves:
+  - fetch menu (`GET /api/menu?tableId=12` or `/api/restaurants/5/menu`)
+  - ensure session context with table/user
+- Optionally: `POST /api/sessions` with `{tableId, deviceId}` and returns `sessionId`.
+
+---
+
+### 3. Customer creates user (if needed / anonymous)
+- API:
+  - `POST /api/users` (name/contact)
+  - or `POST /api/guest` (anonymous, returns userId)
+- Preserve `userId/sessionId` in localStorage/cookie.
+
+---
+
+### 4. Customer builds order cart (frontend)
+- Add items:
+  - in JS state `cart[]`.
+  - `POST /api/cart` for each item or keep client side and send all at checkout.
+- Optional endpoints:
+  - `GET /api/cart?sessionId=...`
+  - `PUT /api/cart/{itemId}`
+  - `DELETE /api/cart/{itemId}`
+
+---
+
+### 5. Checkout / place order
+- `POST /api/orders`
+- Body:
+  - `userId`, `tableId`, `sessionId`, `items: [{productId, quantity, notes}]`, `total`, `paymentMode`
+- Backend returns:
+  - `orderId`, `status: "PENDING"`, `estimatedTime`.
+
+---
+
+### 6. Order status updates
+- Polling or socket:
+  - `GET /api/orders/{orderId}` -> status flow:
+    - `PENDING` -> `CONFIRMED` -> `PREPARING` -> `READY` -> `SERVED`/`DELIVERED`.
+- For QR-UI let customer refresh or use WebSocket.
+
+---
+
+### 7. Kitchen/admin dashboard
+- Endpoint:
+  - `GET /api/orders?status=PENDING`
+  - `PUT /api/orders/{orderId}/status` (kitchen staff update)
+- Backend updates order lifecycle.
+
+---
+
+### 8. "Get all orders" (manager)
+- `GET /api/orders` (with filters `date`, `table`, `status`, `user`)
+- Support printing / analytics.
+
+---
+
+### 9. Feedback
+- After `order.status == SERVED`:
+  - `POST /api/orders/{orderId}/feedback` (rating/comment).
+
+---
+
+## 💡 Optional “real world” enhancements
+- QR deep link includes table+meal-time.
+- table-specific promotions.
+- auto-cancel after timeout.
+- payment flow:
+  - `POST /api/payments` (Stripe/PayPal)
+  - `PATCH /api/orders/{id}/status -> PAID`
+- `PUT /api/orders/{id}/items` (update before preparing)
+
+---
+
+## 📌 Minimal endpoints summary (must-have)
+- `POST /api/users`
+- `GET /api/users/{id}`
+- `GET /api/menu`
+- `POST /api/cart` | `/api/orders`
+- `GET /api/orders`
+- `GET /api/orders/{id}`
+- `PATCH /api/orders/{id}/status`
+
+---
+
+## 🎯 Quick mapping to your app
+1. Create user -> `UserController`.
+2. Create order -> `OrderController`.
+3. Get all orders -> `OrderController`.
+4. Add QR route -> `QrController` or reuse order route.
+5. Add frontend forms/flows.
+
+---
+
+This is your full QR ordering lifecycle.  
+Next step: tell me your current API endpoint names and I’ll give a concrete API contract + sample React page for each step.
